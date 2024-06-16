@@ -11,7 +11,10 @@
 # Test binary, built with `go test -c`
 *.test
 
-
+*.zip
+output/
+Linux/
+Windows/
 
 # Dependency directories (remove the comment below to include it)
 # vendor/

@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"context"
-	"fmt"
 	"os"
 	"sync"
 
@@ -79,9 +78,10 @@ func main() {
 
 	chunkSize := (len(URLS) + threads - 1) / threads
 	chunks := chunkSlice(URLS, chunkSize)
-	fmt.Println(chunks)
-	fmt.Println("chunk size is")
-	fmt.Println(chunkSize + 1)
+
+	if len(URLS) == 1 {
+		chunkSize = 0
+	}
 
 	var wg sync.WaitGroup
 	for i := 0; i < chunkSize+1; i++ {
