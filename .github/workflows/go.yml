@@ -1,0 +1,30 @@
+            - name: Go Release Action
+  # You may pin to the exact commit or the version.
+  # uses: Mmx233/GoReleaseCli@20925c8b00fc69b81aa034bd01146e4e2563291c
+  uses: Mmx233/GoReleaseCli@v1.2.3
+  with:
+    # Target package
+    target: box/bulk-dl
+    # Output binary file name
+    name: bulk-dl
+    # Output dir path
+    output: # optional
+    # Target arch
+    arch: # optional
+    # Build all extra arches
+    extra-arches: # optional
+    # Show default extra arch name
+    extra-arches-show-default: # optional
+    # Target os
+    os: linux,windows,mac
+    # Enable go cgo
+    cgo: # optional
+    # Add custom ldflags
+    ldflags: # optional
+    # Disable ldflags added by default
+    disable-default-ldflags: # optional
+    # How many threads to use for parallel compilation
+    tread: # optional
+    # Compress the binary into the specified format of compressed file
+    compress: # optional
+          
