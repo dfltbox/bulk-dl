@@ -3,13 +3,18 @@ package main
 import (
 	"bufio"
 	"context"
+	"flag"
 	"os"
 	"sync"
 
-	"log"
-
+	"github.com/charmbracelet/log"
 	"github.com/lrstanley/go-ytdlp"
 )
+
+var urlsFilePath string
+var outputPath string
+var audioOnly bool
+var fileStructure string
 
 func download(chunk []string, wg *sync.WaitGroup) {
 	defer wg.Done()
@@ -17,7 +22,8 @@ func download(chunk []string, wg *sync.WaitGroup) {
 	//log.Debug("I am", "place", place, "I have", chunk)
 
 	for _, link := range chunk {
-		//fmt.Println(place, ":", link)
+		log.Info("Attempting to download", "url", link)
+
 		dl := ytdlp.New().
 			FormatSort("res,ext:mp4:m4a").
 			RecodeVideo("mp4").
@@ -26,12 +32,19 @@ func download(chunk []string, wg *sync.WaitGroup) {
 			ProgressTemplate("download-title:%(info.id)s-%(progress.eta)s").
 			NoOverwrites().
 			Continue().
-			Output("/output/%(extractor)s - %(title)s.%(ext)s")
+			Output(outputPath + fileStructure)
+
+		if audioOnly {
+			dl = dl.ExtractAudio()
+			dl = dl.AudioFormat("mp3")
+			dl = dl.UnsetRecodeVideo()
+		}
 
 		_, err := dl.Run(context.TODO(), link)
 		if err != nil {
 			panic(err)
 		}
+		log.Info("Completed Downloading", "url", link)
 	}
 }
 
@@ -51,7 +64,24 @@ func chunkSlice(slice []string, chunkSize int) [][]string {
 }
 
 func main() {
-	ytdlp.MustInstall(context.TODO(), nil)
+	urlsFilePath := flag.String("u", "!", "The file containing the URLs")
+	outputPath := flag.String("o", "output", "The directory the files will be downloaded to")
+	audioOnly := flag.Bool("a", false, "'true' will only download the audio")
+	fileStructure := flag.String("fs", "%(extractor)s - %(title)s.%(ext)s", "'true' will only download the audio")
+	flag.Parse()
+
+	if *urlsFilePath == "!" {
+		log.Fatal("No URL file specified")
+		os.Exit(3)
+	}
+
+	log.Info("Audio Only?", "audioOnly", *audioOnly)
+	log.Info("Output Path", "outputPath", *outputPath)
+	log.Info("File Structure", "fileStructure", *fileStructure)
+	log.Info("URLs File Path", "filePath", *urlsFilePath)
+
+	log.Info("Downloading yt-dlp if you don't already have it")
+	ytdlp.Install(context.Background(), nil)
 
 	urlFile, err := os.Open("URLS.txt")
 	if err != nil {
